@@ -1,0 +1,26 @@
+@echo off
+:: --- CONFIGURAÇÕES DA MÁQUINA VIRTUAL ---
+set VM_NAME="PC_Virtual_VBox"
+set RAM_MB=4096
+set VRAM_MB=128
+set CPU_COUNT=2
+set DISK_SIZE_MB=40960
+
+:: Caminho padrão de instalação do VirtualBox
+cd /d "C:\Program Files\Oracle\VirtualBox"
+
+echo Criando a maquina virtual...
+VBoxManage createvm --name %VM_NAME% --register
+
+echo Configurando hardware (RAM, CPU, Video)...
+VBoxManage modifyvm %VM_NAME% --memory %RAM_MB% --vram %VRAM_MB% --cpus %CPU_COUNT% --graphicscontroller vboxsvga --boot1 dvd --boot2 disk
+
+echo Criando o disco rigido virtual...
+VBoxManage createmedium disk --filename "%USERPROFILE%\VirtualBox VMs\%VM_NAME%\%VM_NAME%.vdi" --size %DISK_SIZE_MB% --format VDI
+
+echo Conectando o disco a maquina...
+VBoxManage storagectl %VM_NAME% --name "SATA Controller" --add sata --controller IntelAHCI
+VBoxManage storageattach %VM_NAME% --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "%USERPROFILE%\VirtualBox VMs\%VM_NAME%\%VM_NAME%.vdi"
+
+echo Maquina virtual %VM_NAME% criada com sucesso!
+pause
